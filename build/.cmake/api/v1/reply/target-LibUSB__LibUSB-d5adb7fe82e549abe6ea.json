@@ -1,0 +1,63 @@
+{
+	"abstract" : true,
+	"backtrace" : 4,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"find_package",
+			"CheckHIDAPI"
+		],
+		"files" : 
+		[
+			"build/_deps/sdl3-src/cmake/FindLibUSB.cmake",
+			"build/_deps/sdl3-src/cmake/sdlchecks.cmake",
+			"build/_deps/sdl3-src/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 2524,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 1261,
+				"parent" : 1
+			},
+			{
+				"file" : 0,
+				"parent" : 2
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 63,
+				"parent" : 3
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 10
+	},
+	"id" : "LibUSB::LibUSB::@405c074760d2f6728126",
+	"imported" : true,
+	"local" : true,
+	"name" : "LibUSB::LibUSB",
+	"paths" : 
+	{
+		"build" : "_deps/sdl3-build",
+		"source" : "build/_deps/sdl3-src"
+	},
+	"sources" : [],
+	"type" : "UNKNOWN_LIBRARY"
+}

@@ -1,0 +1,8 @@
+/Users/cogitary/Desktop/Devs/lsys/build/CMakeFiles/lsys.dir
+/Users/cogitary/Desktop/Devs/lsys/build/CMakeFiles/edit_cache.dir
+/Users/cogitary/Desktop/Devs/lsys/build/CMakeFiles/rebuild_cache.dir
+/Users/cogitary/Desktop/Devs/lsys/build/_deps/sdl3-build/CMakeFiles/SDL3-shared.dir
+/Users/cogitary/Desktop/Devs/lsys/build/_deps/sdl3-build/CMakeFiles/SDL3_test.dir
+/Users/cogitary/Desktop/Devs/lsys/build/_deps/sdl3-build/CMakeFiles/SDL_uclibc.dir
+/Users/cogitary/Desktop/Devs/lsys/build/_deps/sdl3-build/CMakeFiles/edit_cache.dir
+/Users/cogitary/Desktop/Devs/lsys/build/_deps/sdl3-build/CMakeFiles/rebuild_cache.dir

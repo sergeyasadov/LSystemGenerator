@@ -1,0 +1,1 @@
+/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/lsys.dir/src/main.cpp.o CMakeFiles/lsys.dir/src/LSystem.cpp.o CMakeFiles/lsys.dir/src/api/SDL.cpp.o CMakeFiles/lsys.dir/src/Application.cpp.o CMakeFiles/lsys.dir/src/Screen.cpp.o -o lsys  -Wl,-rpath,/Users/cogitary/Desktop/Devs/lsys/build/_deps/sdl3-build _deps/sdl3-build/libSDL3.0.dylib
