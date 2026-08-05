@@ -1,7 +1,8 @@
 #include "Application.hpp"
 #include "Defines.hpp"
 #include "Screen.hpp"
-#include "LSystem.hpp"
+#include "core/Interpreter.hpp"
+#include "core/Typedefs.hpp"
 
 #include <cmath>
 
@@ -20,35 +21,40 @@ Application::~Application() {
 void Application::run() {
     SDL_Log("Application started");
 
+    LSystem::Interpreter lsys;
 
-    LSystem lsys;
-    lsys.set_axiom("F");
-    lsys.set_rules("F", "F+F-F-F+F");
-    lsys.set_iters(8);
+    LSystem::Variable var1 = 'F';
+
+    LSystem::Rule rule1;
+    rule1.var = var1;
+    rule1.action = "F+F-F-F+F";
+
+    LSystem::Constant const1 = '+';
+
+    LSystem::Constant const2 = '-';
+
+    try {
+        lsys.setConstants({const1, const2});
+        lsys.setRule({rule1});
+        lsys.setIterations(4);
+        lsys.setAxiom("F");
+    }
+    catch (std::exception& e) {
+        SDL_Log("Error: %s", e.what());
+        return;
+    }
+
     lsys.run();
-    std::string result = lsys.get_axiom();
+    lsys.print();
+    auto data = lsys.getData();
 
-    SDL_Log("L-System iterations: %u", lsys.get_iters());
-    SDL_Log("L-System size: %zu MB", result.size() / 8 / 1024);
+    SDL_Log("L-System iterations: %u", lsys.getIterations());
+    SDL_Log("L-System size: %zu MB", data.size() / 8 / 1024);
 
 
     std::vector<SDL_FPoint> worldLine;
-    worldLine.resize(result.size());
-    worldLine[0] = {0, 0};
+    worldLine.resize(data.size());
 
-    for(auto i = 1, j = 0, rot = 0; i < worldLine.size(); i++, j++){
-        worldLine[i] = worldLine[i - 1];
-        if(result[j] == 'F') {
-            worldLine[i].x += 10 * std::cos(rot * M_PI_2);
-            worldLine[i].y += 10 * std::sin(rot * M_PI_2);
-        }
-        else if(result[j] == '+') {
-            rot += 1;
-        }
-        else if(result[j] == '-') {
-            rot -= 1;
-        }
-    }
     SDL_Log("worldLine size = %zu", worldLine.size());
 
 
@@ -109,10 +115,10 @@ void Application::run() {
             [&](SDL_Renderer* renderer) {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
-                SDL_RenderLines(renderer,
-                    worldLine.data(),
-                    static_cast<int>(worldLine.size())
-                );
+                // SDL_RenderLines(renderer,
+                //     worldLine.data(),
+                //     static_cast<int>(worldLine.size())
+                // );
 
             },
         });

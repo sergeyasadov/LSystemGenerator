@@ -1,4 +1,3 @@
-#include "LSystem.hpp"
 #include "Application.hpp"
 
 #include <ranges>

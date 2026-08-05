@@ -16,14 +16,15 @@ FetchContent_MakeAvailable(SDL3)
 
 add_executable(${PROJECT_NAME}
   src/main.cpp
-  src/LSystem.cpp
-  src/LSystem.hpp
   src/api/SDL.cpp
   src/api/SDL.hpp
   src/Application.cpp
   src/Application.hpp
   src/Screen.cpp
   src/Screen.hpp
+  src/core/Interpreter.cpp
+  src/core/Interpreter.hpp
+  src/core/Typedefs.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
