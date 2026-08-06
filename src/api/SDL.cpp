@@ -41,15 +41,11 @@ API::SDL::~SDL() {
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "SDL quit successfully");
 }
 //==============================================================================
-void API::SDL::handleEvent(std::vector<EventHandle> handles) {
-    while(SDL_PollEvent(&this->event)) {
-        SDL_ConvertEventToRenderCoordinates(this->renderer, &this->event);
-        for(auto& handle : handles) {
-            if(this->event.type == handle.eventType) {
-                handle.callback(this->event);
-            }
-        }
+std::optional<SDL_Event> API::SDL::pollEvent() {
+    if(SDL_PollEvent(&this->event)) {
+        return this->event;
     }
+    return std::nullopt;
 }
 //==============================================================================
 SDL_Window* API::SDL::getWindow() const {

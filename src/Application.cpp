@@ -87,16 +87,18 @@ void Application::run() {
 
     while(this->running) {
 
-        this->sdl.handleEvent({
-            {SDL_EVENT_QUIT,
-                [&](SDL_Event& event) {
+        while(auto event = this->sdl.pollEvent()) {
+            
+            this->imguiLayer.processEvent(event.value());
+
+            switch(event.value().type) {
+                case SDL_EVENT_QUIT: {
                     this->running = false;
                     SDL_Log("Event: quit");
+                    break;
                 }
-            },
-            {SDL_EVENT_KEY_DOWN,
-                [&](SDL_Event& event) {
-                    switch(event.key.scancode) {
+                case SDL_EVENT_KEY_DOWN: {
+                    switch(event.value().key.scancode) {
                         case SDL_SCANCODE_ESCAPE : {
                             this->running = false;
                             SDL_Log("Event: key_escape");
@@ -104,13 +106,14 @@ void Application::run() {
                         }
 
                         default: {
-                            camera.handleEvent(event);
+                            camera.handleEvent(event.value());
                             break;
                         }
                     }
+                    break;
                 }
             }
-        });
+        }
 
         this->sdl.render({
             [&](SDL_Renderer* renderer) {

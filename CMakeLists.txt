@@ -52,8 +52,8 @@ add_executable(${PROJECT_NAME}
   src/Turtle.hpp
   src/Camera.cpp
   src/Camera.hpp
-  src/api/ImGUI.cpp
-  src/api/ImGUI.hpp
+  src/ui/ImGuiLayer.cpp
+  src/ui/ImGuiLayer.hpp
   ${IMGUI_SOURCES}
 )
 
