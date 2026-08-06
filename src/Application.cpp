@@ -3,7 +3,9 @@
 #include "core/Node.hpp"
 #include "core/Typedefs.hpp"
 #include "Turtle.hpp"
+#include "Camera.hpp"
 
+//==============================================================================
 Application::Application() : running(true), sdl() {
 
 }
@@ -56,7 +58,7 @@ void Application::run() {
     try {
         lsys.setConstants({const1, const2});
         lsys.setRule({rule1, rule2});
-        lsys.setIterations(3);
+        lsys.setIterations(10);
         lsys.setAxiom(axiom);
     }
     catch (const std::exception& e) {
@@ -70,6 +72,8 @@ void Application::run() {
     LSystem::Node node;
     node.add(lsys);
     node.execute(builder);
+
+    Camera camera(1, 20.f);
 
     while(this->running) {
 
@@ -86,37 +90,13 @@ void Application::run() {
                         case SDL_SCANCODE_ESCAPE : {
                             this->running = false;
                             SDL_Log("Event: key_escape");
+                            break;
                         }
 
-                        // case SDL_SCANCODE_A : {
-                        //     for(auto i = 0; i < worldLine.size(); ++i) {
-                        //         worldLine[i].x += Defines::Window::WIDTH / 3;
-                        //     }
-                        //     break;
-                        // }
-
-                        // case SDL_SCANCODE_D : {
-                        //     for(auto i = 0; i < worldLine.size(); ++i) {
-                        //         worldLine[i].x -= Defines::Window::WIDTH / 3;
-                        //     }
-                        //     break;
-                        // }
-
-                        // case SDL_SCANCODE_W : {
-                        //     for(auto i = 0; i < worldLine.size(); ++i) {
-                        //         worldLine[i].y += Defines::Window::HEIGHT / 3;
-                        //     }
-                        //     break;
-                        // }
-
-                        // case SDL_SCANCODE_S : {
-                        //     for(auto i = 0; i < worldLine.size(); ++i) {
-                        //         worldLine[i].y -= Defines::Window::HEIGHT / 3;
-                        //     }
-                        //     break;
-                        // }
-
-                        default: {}
+                        default: {
+                            camera.handleEvent(event);
+                            break;
+                        }
                     }
                 }
             },
@@ -127,7 +107,12 @@ void Application::run() {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
                 for(const auto& [start, end] : builder.getSegments()) {
-                    if(!SDL_RenderLine(renderer, start.x, start.y, end.x, end.y)) {
+                    if(!SDL_RenderLine(
+                        renderer,
+                        start.x * camera.getScale() + camera.getOffsetX(),
+                        start.y * camera.getScale() + camera.getOffsetY(),
+                        end.x * camera.getScale() + camera.getOffsetX(),
+                        end.y * camera.getScale() + camera.getOffsetY())) {
                         SDL_LogError(SDL_LOG_CATEGORY_RENDER,
                             "Failed to render line: %s", SDL_GetError()
                         );

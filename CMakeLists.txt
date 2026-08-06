@@ -31,6 +31,8 @@ add_executable(${PROJECT_NAME}
   src/core/Node.hpp
   src/Turtle.cpp
   src/Turtle.hpp
+  src/Camera.cpp
+  src/Camera.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)

@@ -1,0 +1,25 @@
+#pragma once
+
+#include "SDL3/SDL.h"
+
+
+class Camera {
+    SDL_FPoint offset;
+    float scale;
+    float factor;
+public:
+    Camera();
+    Camera(float scale, float factor);
+
+    const SDL_FPoint& getOffset() const;
+    float getOffsetX() const;
+    float getOffsetY() const;
+    float getScale() const;
+    float getFactor() const;
+
+    void setOffset(const SDL_FPoint& offset);
+    void setScale(float scale);
+    void setFactor(float factor);
+
+    void handleEvent(const SDL_Event& event);
+};
