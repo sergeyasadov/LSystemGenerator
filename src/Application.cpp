@@ -1,21 +1,17 @@
 #include "Application.hpp"
-#include "Defines.hpp"
-#include "Screen.hpp"
 #include "core/Interpreter.hpp"
+#include "core/Node.hpp"
 #include "core/Typedefs.hpp"
-
-#include <cmath>
+#include "Turtle.hpp"
 
 Application::Application() : running(true), sdl() {
 
 }
-
-
+//==============================================================================
 Application::~Application() {
 
 }
-
-
+//==============================================================================
 // september пн 7 число - dr serega  ?
 
 void Application::run() {
@@ -23,42 +19,57 @@ void Application::run() {
 
     LSystem::Interpreter lsys;
 
-    LSystem::Variable var1 = 'F';
+    LSystem::Variable var1;
+    var1.value = 'A';
+    var1.command = [](Turtle::Builder& builder) {
+        builder.forward(true);
+    };
+
+    LSystem::Variable var2;
+    var2.value = 'B';
+    var2.command = [](Turtle::Builder& builder) {
+        builder.forward(true);
+    };
 
     LSystem::Rule rule1;
     rule1.var = var1;
-    rule1.action = "F+F-F-F+F";
+    rule1.action = "B-A-B";
 
-    LSystem::Constant const1 = '+';
+    LSystem::Rule rule2;
+    rule2.var = var2;
+    rule2.action = "A+B+A";
 
-    LSystem::Constant const2 = '-';
+    LSystem::Constant const1;
+    const1.value = '+';
+    const1.command = [](Turtle::Builder& builder) {
+        builder.rotate(60.f);
+    };
+
+    LSystem::Constant const2;
+    const2.value = '-';
+    const2.command = [](Turtle::Builder& builder) {
+        builder.rotate(-60.f);
+    };
+
+    LSystem::Axiom axiom = "A";
 
     try {
         lsys.setConstants({const1, const2});
-        lsys.setRule({rule1});
-        lsys.setIterations(4);
-        lsys.setAxiom("F");
+        lsys.setRule({rule1, rule2});
+        lsys.setIterations(3);
+        lsys.setAxiom(axiom);
     }
-    catch (std::exception& e) {
-        SDL_Log("Error: %s", e.what());
+    catch (const std::exception& e) {
+        SDL_Log("EXCEPTION: %s", e.what());
         return;
     }
-
     lsys.run();
-    lsys.print();
-    auto data = lsys.getData();
 
-    SDL_Log("L-System iterations: %u", lsys.getIterations());
-    SDL_Log("L-System size: %zu MB", data.size() / 8 / 1024);
+    Turtle::Builder builder({100, 300}, 0.f, 4.f);
 
-
-    std::vector<SDL_FPoint> worldLine;
-    worldLine.resize(data.size());
-
-    SDL_Log("worldLine size = %zu", worldLine.size());
-
-
-    constexpr float FACTOR = 12.5f;
+    LSystem::Node node;
+    node.add(lsys);
+    node.execute(builder);
 
     while(this->running) {
 
@@ -77,33 +88,33 @@ void Application::run() {
                             SDL_Log("Event: key_escape");
                         }
 
-                        case SDL_SCANCODE_A : {
-                            for(auto i = 0; i < worldLine.size(); ++i) {
-                                worldLine[i].x += Defines::Window::WIDTH / 3;
-                            }
-                            break;
-                        }
+                        // case SDL_SCANCODE_A : {
+                        //     for(auto i = 0; i < worldLine.size(); ++i) {
+                        //         worldLine[i].x += Defines::Window::WIDTH / 3;
+                        //     }
+                        //     break;
+                        // }
 
-                        case SDL_SCANCODE_D : {
-                            for(auto i = 0; i < worldLine.size(); ++i) {
-                                worldLine[i].x -= Defines::Window::WIDTH / 3;
-                            }
-                            break;
-                        }
+                        // case SDL_SCANCODE_D : {
+                        //     for(auto i = 0; i < worldLine.size(); ++i) {
+                        //         worldLine[i].x -= Defines::Window::WIDTH / 3;
+                        //     }
+                        //     break;
+                        // }
 
-                        case SDL_SCANCODE_W : {
-                            for(auto i = 0; i < worldLine.size(); ++i) {
-                                worldLine[i].y += Defines::Window::HEIGHT / 3;
-                            }
-                            break;
-                        }
+                        // case SDL_SCANCODE_W : {
+                        //     for(auto i = 0; i < worldLine.size(); ++i) {
+                        //         worldLine[i].y += Defines::Window::HEIGHT / 3;
+                        //     }
+                        //     break;
+                        // }
 
-                        case SDL_SCANCODE_S : {
-                            for(auto i = 0; i < worldLine.size(); ++i) {
-                                worldLine[i].y -= Defines::Window::HEIGHT / 3;
-                            }
-                            break;
-                        }
+                        // case SDL_SCANCODE_S : {
+                        //     for(auto i = 0; i < worldLine.size(); ++i) {
+                        //         worldLine[i].y -= Defines::Window::HEIGHT / 3;
+                        //     }
+                        //     break;
+                        // }
 
                         default: {}
                     }
@@ -115,14 +126,17 @@ void Application::run() {
             [&](SDL_Renderer* renderer) {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
-                // SDL_RenderLines(renderer,
-                //     worldLine.data(),
-                //     static_cast<int>(worldLine.size())
-                // );
+                for(const auto& [start, end] : builder.getSegments()) {
+                    if(!SDL_RenderLine(renderer, start.x, start.y, end.x, end.y)) {
+                        SDL_LogError(SDL_LOG_CATEGORY_RENDER,
+                            "Failed to render line: %s", SDL_GetError()
+                        );
+                    }
+                }
 
             },
         });
 
-
     }
 }
+//==============================================================================

@@ -24,7 +24,7 @@ namespace API {
 
         void handleEvent(std::vector<EventHandle> handles);
 
-        void render(std::vector<std::function<void(SDL_Renderer*)>> renderers);
+        void render(std::vector<std::function<void(SDL_Renderer*)>> renderers) const;
     };
 }
 

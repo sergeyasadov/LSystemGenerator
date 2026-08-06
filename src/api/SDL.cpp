@@ -29,7 +29,7 @@ API::SDL::SDL()
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Renderer created successfully");
 
 }
-
+//==============================================================================
 API::SDL::~SDL() {
     SDL_DestroyRenderer(this->renderer);
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Renderer destroyed successfully");
@@ -40,7 +40,7 @@ API::SDL::~SDL() {
     SDL_Quit();
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "SDL quit successfully");
 }
-
+//==============================================================================
 void API::SDL::handleEvent(std::vector<EventHandle> handles) {
     while(SDL_PollEvent(&this->event)) {
         SDL_ConvertEventToRenderCoordinates(this->renderer, &this->event);
@@ -51,14 +51,13 @@ void API::SDL::handleEvent(std::vector<EventHandle> handles) {
         }
     }
 }
-
-void API::SDL::render(std::vector<std::function<void(SDL_Renderer*)>> renderers) {
+//==============================================================================
+void API::SDL::render(std::vector<std::function<void(SDL_Renderer*)>> renderers) const {
     SDL_SetRenderDrawColor(this->renderer, 33, 33, 33, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(this->renderer);
-
     for(auto& r : renderers) {
-        r(this->renderer);
+        std::invoke(r, this->renderer);
     }
-
     SDL_RenderPresent(this->renderer);
 }
+//==============================================================================

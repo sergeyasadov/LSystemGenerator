@@ -24,7 +24,13 @@ add_executable(${PROJECT_NAME}
   src/Screen.hpp
   src/core/Interpreter.cpp
   src/core/Interpreter.hpp
+  src/core/Compiler.cpp
+  src/core/Compiler.hpp
   src/core/Typedefs.hpp
+  src/core/Node.cpp
+  src/core/Node.hpp
+  src/Turtle.cpp
+  src/Turtle.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)

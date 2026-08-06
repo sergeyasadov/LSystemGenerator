@@ -5,7 +5,7 @@
 
 namespace LSystem {
 
-class Interpreter final {
+class Interpreter {
     Rules rules;
     Variables variables;
     Constants constants;
@@ -22,10 +22,10 @@ class Interpreter final {
         void setConstants(std::vector<Constant> constants);
         void setIterations(std::uint32_t iters);
 
-        Rules getRules() const;
-        Constants getConstants() const;
-        Axiom getAxiom() const;
-        Iterations getIterations() const;
+        const Rules& getRules() const;
+        const Constants& getConstants() const;
+        const Axiom& getAxiom() const;
+        const Iterations& getIterations() const;
         const Data& getData() const;
 
         void nextIteration();
