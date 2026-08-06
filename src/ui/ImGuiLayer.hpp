@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imgui.h>
+#include <imnodes.h>
 #include <SDL3/SDL.h>
 #include <functional>
 
@@ -8,7 +9,13 @@ namespace UI {
 
     class ImGuiLayer {
         ImGuiContext* context;
+        ImNodesContext* nodesContext;
         ImGuiIO* io;
+        ImGuiStyle* style;
+        float dpiScale {1.f};
+
+        bool platformInit{false};
+        bool renderInit{false};
 
     public:
         ImGuiLayer();
@@ -18,7 +25,7 @@ namespace UI {
 
         void processEvent(SDL_Event& event);
 
-        void render(SDL_Renderer* renderer, std::function<void()>& f);
+        void render(SDL_Renderer* renderer, std::function<void()> f);
     };
 
 }

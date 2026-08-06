@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SDL3/SDL.h"
-
+#include <SDL3/SDL.h>
+#include <glm/vec4.hpp>
 
 class Camera {
     SDL_FPoint offset;
@@ -22,4 +22,6 @@ public:
     void setFactor(float factor);
 
     void handleEvent(const SDL_Event& event);
+
+    glm::vec4 transform(const glm::vec4& position) const;
 };

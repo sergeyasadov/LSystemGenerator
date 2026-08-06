@@ -80,3 +80,12 @@ void Camera::handleEvent(const SDL_Event& event)
     }
 }
 //==============================================================================
+glm::vec4 Camera::transform(const glm::vec4& position) const {
+    return {
+        position.x * this->scale + this->offset.x,
+        position.y * this->scale + this->offset.y,
+        position.z * this->scale + this->offset.x,
+        position.w * this->scale + this->offset.y
+    };
+}
+//==============================================================================
