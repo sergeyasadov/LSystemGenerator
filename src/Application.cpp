@@ -5,8 +5,11 @@
 #include "Turtle.hpp"
 #include "Camera.hpp"
 
+
+#include <imgui.h>
+
 //==============================================================================
-Application::Application() : running(true), sdl() {
+Application::Application() : running(true), sdl(), imguiLayer() {
 
 }
 //==============================================================================
@@ -18,6 +21,13 @@ Application::~Application() {
 
 void Application::run() {
     SDL_Log("Application started");
+
+    try {
+        this->imguiLayer.init(this->sdl.getWindow(), this->sdl.getRenderer());
+    } catch (const std::exception& e) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to initialize ImGUI: %s", e.what());
+        return;
+    }
 
     LSystem::Interpreter lsys;
 
@@ -99,7 +109,7 @@ void Application::run() {
                         }
                     }
                 }
-            },
+            }
         });
 
         this->sdl.render({

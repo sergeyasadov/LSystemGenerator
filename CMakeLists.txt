@@ -13,6 +13,27 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL3)
 
+FetchContent_Declare(
+  imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG v1.92.9-docking
+)
+FetchContent_MakeAvailable(imgui)
+
+set(IMGUI_DIR ${imgui_SOURCE_DIR})
+
+set(IMGUI_SOURCES
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_sdl3.h
+    ${IMGUI_DIR}/backends/imgui_impl_sdlrenderer3.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_sdlrenderer3.h
+)
+
 
 add_executable(${PROJECT_NAME}
   src/main.cpp
@@ -20,8 +41,6 @@ add_executable(${PROJECT_NAME}
   src/api/SDL.hpp
   src/Application.cpp
   src/Application.hpp
-  src/Screen.cpp
-  src/Screen.hpp
   src/core/Interpreter.cpp
   src/core/Interpreter.hpp
   src/core/Compiler.cpp
@@ -33,6 +52,11 @@ add_executable(${PROJECT_NAME}
   src/Turtle.hpp
   src/Camera.cpp
   src/Camera.hpp
+  src/api/ImGUI.cpp
+  src/api/ImGUI.hpp
+  ${IMGUI_SOURCES}
 )
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${IMGUI_DIR} ${IMGUI_DIR}/backends)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)

@@ -4,13 +4,13 @@
 #include "SDL3/SDL_pixels.h"
 #include "SDL3/SDL_render.h"
 
-
+//==============================================================================
 API::SDL::SDL()
 :   window(nullptr),
     renderer(nullptr),
     windowFlags(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY),
-    event(0) {
-
+    event(0)
+{
     this->window = SDL_CreateWindow(
         Defines::Window::TITLE,
         Defines::Window::WIDTH,
@@ -50,6 +50,14 @@ void API::SDL::handleEvent(std::vector<EventHandle> handles) {
             }
         }
     }
+}
+//==============================================================================
+SDL_Window* API::SDL::getWindow() const {
+    return this->window;
+}
+//==============================================================================
+SDL_Renderer* API::SDL::getRenderer() const {
+    return this->renderer;
 }
 //==============================================================================
 void API::SDL::render(std::vector<std::function<void(SDL_Renderer*)>> renderers) const {

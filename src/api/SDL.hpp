@@ -3,7 +3,7 @@
 
 #include <SDL3/SDL.h>
 #include <functional>
-
+#include <span>
 
 struct EventHandle {
     SDL_EventType eventType;
@@ -23,6 +23,9 @@ namespace API {
         ~SDL();
 
         void handleEvent(std::vector<EventHandle> handles);
+
+        SDL_Window* getWindow() const;
+        SDL_Renderer* getRenderer() const;
 
         void render(std::vector<std::function<void(SDL_Renderer*)>> renderers) const;
     };

@@ -1,6 +1,7 @@
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
+
 namespace Defines {
     namespace Window {
         inline constexpr auto TITLE = "LSystem";
