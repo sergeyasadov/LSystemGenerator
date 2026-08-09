@@ -8,10 +8,10 @@
 
 using namespace LSystem;
 
-void Interpreter::setAxiom(std::string axiom) {
-    if(axiom.empty()) {
-        throw std::invalid_argument("Axiom cannot be empty");
-    }
+void Interpreter::setAxiom(std::string_view axiom) {
+    // if(axiom.empty()) {
+    //     throw std::invalid_argument("Axiom cannot be empty");
+    // }
     this->axiom = std::move(axiom);
     this->data = this->axiom;
 }

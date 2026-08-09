@@ -1,4 +1,5 @@
 #include "Compiler.hpp"
+#include "Typedefs.hpp"
 
 #include <unordered_map>
 
@@ -8,7 +9,7 @@ LSystem::Compiler::Compiler()
 //==============================================================================
 void LSystem::Compiler::compile(const LSystem::Interpreter& interpreter, Turtle::Builder& turtle
 ) {
-    std::unordered_map<char, LSystem::Command> commandMap;
+    std::unordered_map<LSystem::Value, LSystem::Command> commandMap;
     for(const auto& [var, _] : interpreter.getRules()) {
         if(var.command == nullptr) {
             SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Rule %c has no command", var.value);

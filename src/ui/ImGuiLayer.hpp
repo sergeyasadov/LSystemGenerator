@@ -14,7 +14,7 @@ namespace UI {
         ImGuiStyle* style;
         float dpiScale {1.f};
 
-        bool platformInit{false};
+        bool platformInit{false}    ;
         bool renderInit{false};
 
     public:

@@ -2,14 +2,13 @@
 
 #include "Interpreter.hpp"
 #include "../Turtle.hpp"
-#include "../api/SDL.hpp"
 
 #include <vector>
 
 
 namespace LSystem {
 
-    class Node {
+    class Pipeline {
         std::vector<LSystem::Interpreter> interpreters;
 
     public:

@@ -17,10 +17,12 @@ class Interpreter {
         Interpreter() = default;
         ~Interpreter() = default;
 
-        void setAxiom(std::string axiom);
+        void setAxiom(std::string_view axiom);
         void setRule(std::vector<Rule> rules);
         void setConstants(std::vector<Constant> constants);
         void setIterations(std::uint32_t iters);
+
+        Command makeCommand();
 
         const Rules& getRules() const;
         const Constants& getConstants() const;

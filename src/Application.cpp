@@ -1,12 +1,18 @@
 #include "Application.hpp"
 #include "core/Interpreter.hpp"
-#include "core/Node.hpp"
+#include "core/Pipeline.hpp"
 #include "core/Typedefs.hpp"
 #include "Turtle.hpp"
 #include "Camera.hpp"
 
+#include <array>
+#include <cstddef>
+#include <cstring>
 #include <imgui.h>
 #include <imnodes.h>
+#include <format>
+#include <cstdint>
+#include <variant>
 
 //==============================================================================
 Application::Application() : running(true), sdl(), imguiLayer() {
@@ -29,6 +35,8 @@ void Application::run() {
 
     Camera camera(1, 20.f);
 
+    // std::vector<Editor::Link> links;
+    // int nextLinkId{1000};
 
     while(this->running) {
 
@@ -82,38 +90,67 @@ void Application::run() {
             [&](SDL_Renderer* renderer) {
                 this->imguiLayer.render(renderer, [&] {
 
-                    if(ImGui::Begin("Test")) {
+                    if(ImGui::Begin("Editor")) {
 
-                        ImNodes::BeginNodeEditor();
-
-                        ImNodes::BeginNode(1);
-                        ImNodes::BeginNodeTitleBar();
-                        ImGui::TextUnformatted("Node 1");
-                        ImNodes::EndNodeTitleBar();
-
-                        ImNodes::BeginOutputAttribute(101);
-                        ImGui::TextUnformatted("Value out");
-                        ImNodes::EndOutputAttribute();
-                        ImNodes::EndNode();
-
-                        ImNodes::BeginNode(2);
-                        ImNodes::BeginNodeTitleBar();
-                        ImGui::TextUnformatted("Node 2");
-                        ImNodes::EndNodeTitleBar();
-
-                        ImNodes::BeginInputAttribute(201);
-                        ImGui::TextUnformatted("Value in");
-                        ImNodes::EndInputAttribute();
-                        ImNodes::EndNode();
-                        ImNodes::Link(1000, 101, 201);
-                        ImNodes::EndNodeEditor();
                     }
                     ImGui::End();
+
+
+
+                    // if(ImGui::Begin("Editor")) {
+
+                    //     ImNodes::BeginNodeEditor();
+
+                    //     ImNodes::BeginNode(1);
+                    //     ImNodes::BeginNodeTitleBar();
+                    //     ImGui::TextUnformatted("Node 1");
+                    //     ImNodes::EndNodeTitleBar();
+
+                    //     ImNodes::BeginOutputAttribute(101);
+                    //     ImGui::TextUnformatted("Value out");
+                    //     ImNodes::EndOutputAttribute();
+                    //     ImNodes::EndNode();
+
+                    //     ImNodes::BeginNode(2);
+                    //     ImNodes::BeginNodeTitleBar();
+                    //     ImGui::TextUnformatted("Node 2");
+                    //     ImNodes::EndNodeTitleBar();
+
+                    //     ImNodes::BeginInputAttribute(201);
+                    //     ImGui::TextUnformatted("Value in");
+                    //     ImNodes::EndInputAttribute();
+                    //     ImNodes::EndNode();
+
+                    //     for(const auto& link : links) {
+                    //         ImNodes::Link(
+                    //             link.id,
+                    //             link.fromAttr,
+                    //             link.toAttr
+                    //         );
+                    //     }
+                    //     ImNodes::EndNodeEditor();
+                    // }
+                    // ImGui::End();
                 });
             }
 
         });
 
+
+        // int startAttr, endAttr;
+        // if(ImNodes::IsLinkCreated(&startAttr, &endAttr)) {
+        //     links.push_back({nextLinkId++, startAttr, endAttr});
+        // }
+
+        // int linkDestr;
+        // if(ImNodes::IsLinkDestroyed(&linkDestr)) {
+        //     for(auto it = links.begin(); it != links.end(); ++it) {
+        //         if(it->id == linkDestr) {
+        //             links.erase(it);
+        //             break;
+        //         }
+        //     }
+        // }
     }
 }
 //==============================================================================

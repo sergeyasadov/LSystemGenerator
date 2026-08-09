@@ -94,8 +94,8 @@ add_executable(${PROJECT_NAME}
     src/core/Compiler.cpp
     src/core/Compiler.hpp
     src/core/Typedefs.hpp
-    src/core/Node.cpp
-    src/core/Node.hpp
+    src/core/Pipeline.cpp
+    src/core/Pipeline.hpp
 
     src/Turtle.cpp
     src/Turtle.hpp
@@ -105,6 +105,11 @@ add_executable(${PROJECT_NAME}
 
     src/ui/ImGuiLayer.cpp
     src/ui/ImGuiLayer.hpp
+
+    src/ui/editor/Node.cpp
+    src/ui/editor/Node.hpp
+    src/ui/editor/Pipeline.cpp
+    src/ui/editor/Pipeline.hpp
 )
 
 target_link_libraries(${PROJECT_NAME}
