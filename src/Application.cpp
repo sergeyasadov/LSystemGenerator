@@ -3,6 +3,7 @@
 #include "core/Pipeline.hpp"
 #include "core/Typedefs.hpp"
 #include "Turtle.hpp"
+#include "ui/editor/Pipeline.hpp"
 #include "Camera.hpp"
 
 #include <array>
@@ -32,11 +33,12 @@ void Application::run() {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to initialize ImGUI: %s", e.what());
         return;
     }
-
-    Camera camera(1, 20.f);
-
     // std::vector<Editor::Link> links;
     // int nextLinkId{1000};
+
+    Camera camera(1, 20.f);
+    // Turtle::Builder builder;s
+    UI::Editor::Pipeline uiEditor;
 
     while(this->running) {
 
@@ -91,7 +93,21 @@ void Application::run() {
                 this->imguiLayer.render(renderer, [&] {
 
                     if(ImGui::Begin("Editor")) {
+                        if(uiEditor.draw()) {
+                            auto result = uiEditor.build();
 
+                            if(result.has_value()) {
+                                auto lsys = std::move(result.value());
+                                lsys.run();
+                                lsys.print();
+                            }
+                            else {
+                                SDL_LogError(SDL_LOG_CATEGORY_RENDER,
+                                    "Failed to build LSystem: %s",
+                                    result.error().c_str()
+                                );
+                            }
+                        }
                     }
                     ImGui::End();
 

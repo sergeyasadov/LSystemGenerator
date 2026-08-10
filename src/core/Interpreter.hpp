@@ -2,6 +2,8 @@
 
 #include "Typedefs.hpp"
 
+#include "../ui/editor/Draft.hpp"
+
 
 namespace LSystem {
 
@@ -18,11 +20,14 @@ class Interpreter {
         ~Interpreter() = default;
 
         void setAxiom(std::string_view axiom);
-        void setRule(std::vector<Rule> rules);
+        void setRules(std::vector<Rule> rules);
         void setConstants(std::vector<Constant> constants);
         void setIterations(std::uint32_t iters);
 
-        Command makeCommand();
+        void pushRule(Rule rule);
+        void pushConstant(Constant constant);
+
+        Command makeCommand(const UI::Editor::Draft::Command& draft);
 
         const Rules& getRules() const;
         const Constants& getConstants() const;

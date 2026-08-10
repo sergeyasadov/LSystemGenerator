@@ -1,9 +1,11 @@
 #include "Pipeline.hpp"
 
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
+#include <string>
 
 bool UI::Editor::Pipeline::draw() {
-    ImGui::InputText("Axiom", this->axiom.data(), 32);
+    ImGui::InputText("Axiom", &this->axiom);
     ImGui::InputInt("Iterations", &this->iters);
 
     ImGui::SeparatorText("Rules");
@@ -19,33 +21,58 @@ bool UI::Editor::Pipeline::draw() {
             this->error.c_str()
         );
     }
+    else {
+        ImGui::Text("");
+    }
 
     return ImGui::Button("Apply");
 }
 
 std::expected<LSystem::Interpreter, std::string>
-UI::Editor::Pipeline::build() const {
+UI::Editor::Pipeline::build() {
     if(this->axiom.empty()) {
-        return std::unexpected("Axiom cannot be empty");
+        this->error = "Axiom cannot be empty";
+        return std::unexpected(this->error);
     }
 
     if(this->iters < 1) {
-        return std::unexpected("Iterations must be greater than zero");
+        this->error = "Iterations must be greater than zero";
+        return std::unexpected(this->error);
     }
 
-    // if(this->rules.empty()) {
-    //     return std::unexpected("Rules cannot be empty");
-    // }
 
-    // if(this->constants.empty()) {
-    //     return std::unexpected("Constants cannot be empty");
-    // }
+    LSystem::Interpreter interpreter;
+
+    interpreter.setAxiom(std::move(this->axiom));
+    interpreter.setIterations(std::move(this->iters));
 
     for(const auto& rule : this->rules) {
-        if(rule.symbol.size() != 1) {
-            return std::unexpected("Rule symbol must be a single character");
+        if(rule.symbol.size() > 1) {
+            this->error = "Rule symbol must be a single character";
+            return std::unexpected(this->error);
         }
+        interpreter.pushRule({
+            .var = {
+                .value = rule.symbol[0],
+                .command = interpreter.makeCommand(rule.command)
+            },
+            .replacement = rule.replacement
+        });
     }
+
+    for(const auto& constant : this->constants) {
+        if(constant.name.size() > 1) {
+            this->error = "Constant name must be a single character";
+            return std::unexpected(this->error);
+        }
+        interpreter.pushConstant({
+            .value = constant.name[0],
+            .command = interpreter.makeCommand(constant.command)
+        });
+    }
+
+    this->error.clear();
+    return interpreter;
 }
 
 
@@ -56,11 +83,13 @@ void UI::Editor::Pipeline::drawRules() {
         });
     }
 
+    static constexpr const char* commands[] = {"FORWARD", "ROTATE", "SAVE", "RESTORE"};
+
     if(ImGui::BeginTable("Rules", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
-        ImGui::TableSetupColumn("ID");
         ImGui::TableSetupColumn("Symbol");
         ImGui::TableSetupColumn("Replacement");
         ImGui::TableSetupColumn("Command");//, ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Delete");
         ImGui::TableHeadersRow();
 
         for(auto& rule : this->rules) {
@@ -69,13 +98,12 @@ void UI::Editor::Pipeline::drawRules() {
 
             ImGui::TableSetColumnIndex(0);
             ImGui::SetNextItemWidth(50.f);
-            ImGui::InputText("##Symbol", rule.symbol.data(), 32);
+            ImGui::InputText("##Symbol", &rule.symbol);
 
             ImGui::TableSetColumnIndex(1);
-            ImGui::InputText("##Replacement", rule.replacement.data(), 32);
+            ImGui::InputText("##Replacement", &rule.replacement);
 
             ImGui::TableSetColumnIndex(2);
-            static constexpr const char* commands[] = {"FORWARD", "BACKWARD", "LEFT", "RIGHT"};
             int command = static_cast<int>(rule.command.type);
 
             if(ImGui::Combo("##Command", &command, commands, 4)) {
@@ -100,23 +128,28 @@ void UI::Editor::Pipeline::drawConstants() {
         });
     }
 
+    static constexpr const char* commands[] = {"FORWARD", "ROTATE", "SAVE", "RESTORE"};
 
-    if(ImGui::BeginTable("Constants", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+    if(ImGui::BeginTable("Constants", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+        ImGui::TableSetupColumn("Symbol");
+        ImGui::TableSetupColumn("Argument");
+        ImGui::TableSetupColumn("Command");
+        ImGui::TableSetupColumn("Delete");
+        ImGui::TableHeadersRow();
+
         for(auto& constant : this->constants) {
             ImGui::PushID(static_cast<int>(constant.id));
             ImGui::TableNextRow();
 
             ImGui::TableSetColumnIndex(0);
             ImGui::SetNextItemWidth(50.f);
-            ImGui::InputText("##Name", constant.name.data(), 32);
+            ImGui::InputText("##Symbol", &constant.name);
 
             ImGui::TableSetColumnIndex(1);
             ImGui::SetNextItemWidth(50.f);
-            // ImGui::InputText("##Symbol", constant.command.argument, 32);
             ImGui::InputFloat("##Argument", &constant.command.argument);
 
             ImGui::TableSetColumnIndex(2);
-            static constexpr const char* commands[] = {"FORWARD", "BACKWARD", "LEFT", "RIGHT"};
             int command = static_cast<int>(constant.command.type);
 
             if(ImGui::Combo("##Command", &command, commands, 4)) {

@@ -36,6 +36,8 @@ add_library(imgui STATIC
 
     "${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp"
     "${IMGUI_DIR}/backends/imgui_impl_sdlrenderer3.cpp"
+
+    "${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp"
 )
 
 add_library(imgui::imgui ALIAS imgui)

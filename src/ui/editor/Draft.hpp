@@ -14,7 +14,7 @@ namespace UI::Editor::Draft {
 
     struct Rule final {
         std::uint64_t id;
-        std::string symbol;
+        std::string symbol{"A"};
         std::string replacement;
         Command command;
     };

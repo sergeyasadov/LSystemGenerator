@@ -9,14 +9,14 @@
 using namespace LSystem;
 
 void Interpreter::setAxiom(std::string_view axiom) {
-    // if(axiom.empty()) {
-    //     throw std::invalid_argument("Axiom cannot be empty");
-    // }
+    if(axiom.empty()) {
+        throw std::invalid_argument("Axiom cannot be empty");
+    }
     this->axiom = std::move(axiom);
     this->data = this->axiom;
 }
 //==============================================================================
-void Interpreter::setRule(std::vector<Rule> rules) {
+void Interpreter::setRules(std::vector<Rule> rules) {
     for(const auto& rule : rules) {
         if(this->isConstant(rule.var.value)) {
             throw std::invalid_argument("Variable is a constant");
@@ -87,7 +87,7 @@ void Interpreter::nextIteration() {
             [](const Rule& rule) { return rule.var.value; }
         );
         if(rule != this->rules.end()) {
-            next += rule->action;
+            next += rule->replacement;
         }
         else {
             next.push_back(symbol);
@@ -100,6 +100,14 @@ void Interpreter::nextIteration() {
     //     auto splitView = this->axiom | std::views::split(var);
     //     auto joinedView = splitView | std::views::join_with(action);
     //     this->axiom = satd::string(std::from_range, joinedView);
+}
+//==============================================================================
+void Interpreter::pushRule(Rule rule) {
+    this->rules.push_back(rule);
+}
+//==============================================================================
+void Interpreter::pushConstant(Constant constant) {
+    this->constants.push_back(constant);
 }
 //==============================================================================
 void Interpreter::run() {
@@ -116,5 +124,20 @@ bool Interpreter::isConstant(char c) const {
     return std::ranges::any_of(this->constants, [c](const Constant& constant) {
         return constant.value == c;
     });
+}
+//==============================================================================
+LSystem::Command Interpreter::makeCommand(const UI::Editor::Draft::Command& draft) {
+    switch(draft.type) {
+        case CommandType::FORWARD:
+            return [draft](Turtle::Builder& builder) { builder.forward(draft.draw); };
+        case CommandType::ROTATE:
+            return [draft](Turtle::Builder& builder) { builder.rotate(draft.argument); };
+        case CommandType::SAVE:
+            return [](Turtle::Builder& builder) { builder.save(); };
+        case CommandType::RESTORE:
+            return [](Turtle::Builder& builder) { builder.restore(); };
+        default:
+            return {};
+    }
 }
 //==============================================================================

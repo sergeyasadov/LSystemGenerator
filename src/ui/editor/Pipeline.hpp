@@ -23,7 +23,7 @@ namespace UI::Editor {
 
         [[nodiscard]]
         std::expected<LSystem::Interpreter, std::string>
-        build() const;
+        build();
 
     private:
         void removeRule(std::uint64_t id);
