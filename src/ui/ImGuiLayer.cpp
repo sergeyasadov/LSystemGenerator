@@ -1,16 +1,31 @@
 #include "ImGuiLayer.hpp"
-#include "SDL3/SDL_log.h"
+#include "../Defines.hpp"
 
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
+
+#include <quill/LogMacros.h>
+#include <quill/Frontend.h>
 
 //==============================================================================
 UI::ImGuiLayer::ImGuiLayer() {
     IMGUI_CHECKVERSION();
 
+    this->logger = quill::Frontend::get_logger(Defines::Logger::Names::IMGUI_LAYER);
+
     this->context = ImGui::CreateContext();
+    if(!this->context) {
+        throw std::runtime_error("Failed to create ImGui context");
+    }
+    LOG_INFO(this->logger, "Context created");
+
 
     this->nodesContext = ImNodes::CreateContext();
+    if(!this->nodesContext) {
+        throw std::runtime_error("Failed to create ImNodes context");
+    }
+    LOG_INFO(this->logger, "ImNodes context created");
+
 
     this->io = &ImGui::GetIO();
     this->io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -25,17 +40,20 @@ UI::ImGuiLayer::ImGuiLayer() {
 void UI::ImGuiLayer::init(SDL_Window* window, SDL_Renderer* renderer) {
     this->style->ScaleAllSizes(this->dpiScale);
     this->style->FontScaleDpi = this->dpiScale;
+    LOG_INFO(this->logger, "ImGui style set");
+    LOG_INFO(this->logger, "ImGui style scaled by dpi scale: {}", this->dpiScale);
 
     if(!ImGui_ImplSDL3_InitForSDLRenderer(window, renderer)) {
         throw std::runtime_error("Failed to initialize ImGui for SDL renderer");
     }
-    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "ImGuiLayer: platform init");
+    LOG_INFO(this->logger, "Platform init");
+
     this->platformInit = true;
     if(!ImGui_ImplSDLRenderer3_Init(renderer)) {
         ImGui_ImplSDL3_Shutdown();
         throw std::runtime_error("Failed to initialize ImGui for SDL renderer");
     }
-    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "ImGuiLayer: render init");
+    LOG_INFO(this->logger, "Render init");
     this->renderInit = true;
 }
 
@@ -43,21 +61,21 @@ void UI::ImGuiLayer::init(SDL_Window* window, SDL_Renderer* renderer) {
 UI::ImGuiLayer::~ImGuiLayer() {
     if(this->platformInit) {
         ImGui_ImplSDLRenderer3_Shutdown();
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "ImGuiLayer: platform shutdown");
+        LOG_INFO(this->logger, "Platform shutdown");
     }
     if(this->renderInit) {
         ImGui_ImplSDL3_Shutdown();
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "ImGuiLayer: render shutdown");
+        LOG_INFO(this->logger, "Render shutdown");
     }
 
     if(this->nodesContext != nullptr) {
         ImNodes::DestroyContext(this->nodesContext);
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "ImGuiLayer: nodes context shutdown");
+        LOG_INFO(this->logger, "Nodes context shutdown");
     }
 
     if(this->context != nullptr) {
         ImGui::DestroyContext(this->context);
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "ImGuiLayer: context shutdown");
+        LOG_INFO(this->logger, "Context shutdown");
     }
 }
 //==============================================================================

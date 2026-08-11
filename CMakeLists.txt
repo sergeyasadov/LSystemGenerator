@@ -82,6 +82,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 #===============================================================================
+FetchContent_Declare(
+    quill
+    GIT_REPOSITORY https://github.com/odygrd/quill.git
+    GIT_TAG v12.1.0
+)
+FetchContent_MakeAvailable(quill)
+
+set(QUILL_COMPILE_WITH_HEADER_ONLY OFF CACHE INTERNAL "")
+#===============================================================================
 add_executable(${PROJECT_NAME}
     src/main.cpp
 
@@ -112,6 +121,9 @@ add_executable(${PROJECT_NAME}
     src/ui/editor/Node.hpp
     src/ui/editor/Pipeline.cpp
     src/ui/editor/Pipeline.hpp
+
+    src/utils/Logger.cpp
+    src/utils/Logger.hpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -120,4 +132,5 @@ target_link_libraries(${PROJECT_NAME}
         glm::glm
         imgui::imgui
         imnodes
+        quill::quill
 )

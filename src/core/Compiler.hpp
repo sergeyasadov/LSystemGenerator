@@ -18,8 +18,6 @@ public:
     void compile(const LSystem::Interpreter& interpreter, Turtle::Builder& turtle);
 
     const std::vector<SDL_FPoint>& getPoints() const;
-
-    void print() const;
 };
 
 

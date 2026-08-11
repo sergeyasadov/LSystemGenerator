@@ -5,6 +5,8 @@
 #include <functional>
 #include <optional>
 
+#include <quill/Logger.h>
+
 struct EventHandle {
     SDL_EventType eventType;
     std::function<void(SDL_Event&)> callback;
@@ -17,6 +19,7 @@ namespace API {
         SDL_Renderer* renderer;
         SDL_WindowFlags windowFlags;
         SDL_Event event;
+        quill::Logger* logger;
 
     public:
         SDL();
@@ -26,6 +29,8 @@ namespace API {
 
         SDL_Window* getWindow() const;
         SDL_Renderer* getRenderer() const;
+
+        void getSize(int* x, int* y) const;
 
         void render(std::vector<std::function<void(SDL_Renderer*)>> renderers) const;
     };

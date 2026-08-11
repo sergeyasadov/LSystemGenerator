@@ -36,6 +36,8 @@ namespace Turtle {
         void rotate(float angle);
         void restore();
         void save();
+
+        void clear();
     };
 
 }

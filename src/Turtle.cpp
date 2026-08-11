@@ -46,3 +46,11 @@ const std::vector<Turtle::Segment>& Turtle::Builder::getSegments() const {
     return this->segments;
 }
 //==============================================================================
+void Turtle::Builder::clear() {
+    this->segments.clear();
+    this->segmentStack.clear();
+    this->stateStack = std::stack<State>();
+    this->state.position = {0.0f, 0.0f};
+    this->state.angle = 0.0f;
+}
+//==============================================================================

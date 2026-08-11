@@ -7,7 +7,7 @@
 
 
 using namespace LSystem;
-
+//==============================================================================
 void Interpreter::setAxiom(std::string_view axiom) {
     if(axiom.empty()) {
         throw std::invalid_argument("Axiom cannot be empty");
@@ -28,7 +28,6 @@ void Interpreter::setRules(std::vector<Rule> rules) {
             [](const Rule& rule) { return rule.var.value; }
         );
         if(duplicate != this->rules.end()) {
-            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Duplicate variable: '%c'", rule.var.value);
             throw std::invalid_argument("Duplicate variable");
         }
 
@@ -114,10 +113,6 @@ void Interpreter::run() {
     for(auto i = 0; i < this->iterations; i++) {
         this->nextIteration();
     }
-}
-//==============================================================================
-void Interpreter::print() {
-    std::printf("%s\n", this->data.c_str());
 }
 //==============================================================================
 bool Interpreter::isConstant(char c) const {

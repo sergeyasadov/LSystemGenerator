@@ -36,7 +36,6 @@ class Interpreter {
         const Data& getData() const;
 
         void nextIteration();
-        void print();
         void run();
 
     private:

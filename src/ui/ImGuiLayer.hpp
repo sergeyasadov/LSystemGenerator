@@ -5,6 +5,8 @@
 #include <SDL3/SDL.h>
 #include <functional>
 
+#include <quill/Logger.h>
+
 namespace UI {
 
     class ImGuiLayer {
@@ -14,7 +16,9 @@ namespace UI {
         ImGuiStyle* style;
         float dpiScale {1.f};
 
-        bool platformInit{false}    ;
+        quill::Logger* logger;
+
+        bool platformInit{false};
         bool renderInit{false};
 
     public:

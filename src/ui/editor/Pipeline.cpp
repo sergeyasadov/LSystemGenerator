@@ -1,5 +1,7 @@
 #include "Pipeline.hpp"
 
+#include "../../core/Typedefs.hpp"
+
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <string>
@@ -83,8 +85,6 @@ void UI::Editor::Pipeline::drawRules() {
         });
     }
 
-    static constexpr const char* commands[] = {"FORWARD", "ROTATE", "SAVE", "RESTORE"};
-
     if(ImGui::BeginTable("Rules", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
         ImGui::TableSetupColumn("Symbol");
         ImGui::TableSetupColumn("Replacement");
@@ -97,20 +97,23 @@ void UI::Editor::Pipeline::drawRules() {
             ImGui::TableNextRow();
 
             ImGui::TableSetColumnIndex(0);
-            ImGui::SetNextItemWidth(50.f);
+            ImGui::SetNextItemWidth(100.f);
             ImGui::InputText("##Symbol", &rule.symbol);
 
             ImGui::TableSetColumnIndex(1);
+            ImGui::SetNextItemWidth(100.f);
             ImGui::InputText("##Replacement", &rule.replacement);
 
             ImGui::TableSetColumnIndex(2);
+            ImGui::SetNextItemWidth(100.f);
             int command = static_cast<int>(rule.command.type);
 
-            if(ImGui::Combo("##Command", &command, commands, 4)) {
+            if(ImGui::Combo("##Command", &command, LSystem::commands_cstr.data(), static_cast<int>(LSystem::commands_cstr.size()))) {
                 rule.command.type = static_cast<LSystem::CommandType>(command);
             }
 
             ImGui::TableSetColumnIndex(3);
+            ImGui::SetNextItemWidth(100.f);
             if(ImGui::Button("X")) {
                 this->removeRule(rule.id);
             }
@@ -128,8 +131,6 @@ void UI::Editor::Pipeline::drawConstants() {
         });
     }
 
-    static constexpr const char* commands[] = {"FORWARD", "ROTATE", "SAVE", "RESTORE"};
-
     if(ImGui::BeginTable("Constants", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
         ImGui::TableSetupColumn("Symbol");
         ImGui::TableSetupColumn("Argument");
@@ -142,17 +143,23 @@ void UI::Editor::Pipeline::drawConstants() {
             ImGui::TableNextRow();
 
             ImGui::TableSetColumnIndex(0);
-            ImGui::SetNextItemWidth(50.f);
+            ImGui::SetNextItemWidth(100.f);
             ImGui::InputText("##Symbol", &constant.name);
 
             ImGui::TableSetColumnIndex(1);
-            ImGui::SetNextItemWidth(50.f);
+            ImGui::SetNextItemWidth(100.f);
             ImGui::InputFloat("##Argument", &constant.command.argument);
 
             ImGui::TableSetColumnIndex(2);
+            ImGui::SetNextItemWidth(100.f);
             int command = static_cast<int>(constant.command.type);
 
-            if(ImGui::Combo("##Command", &command, commands, 4)) {
+            if(ImGui::Combo(
+                "##Command",
+                &command,
+                LSystem::commands_cstr.data(),
+                static_cast<int>( LSystem::commands_cstr.size()) )
+            ) {
                 constant.command.type = static_cast<LSystem::CommandType>(command);
             }
 

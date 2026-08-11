@@ -18,14 +18,12 @@ namespace LSystem {
     using Data = std::string;
     using Command = std::function<void(Turtle::Builder&)>;
 
-
     enum class CommandType {
         FORWARD,
         ROTATE,
         SAVE,
         RESTORE
     };
-
 
     struct Variable final {
         Value value;
@@ -47,9 +45,8 @@ namespace LSystem {
     using Constants = std::vector<Constant>;
     using Commands = std::unordered_map<char, Command>;
 
-    static constexpr std::array action_cstr = {
-        "rotate", "forward"
+    static constexpr std::array commands_cstr = {
+        "FORWARD", "ROTATE", "SAVE", "RESTORE", "RANDOM"
     };
-
 
 };

@@ -1,46 +1,67 @@
 #include "Application.hpp"
-#include "core/Interpreter.hpp"
-#include "core/Pipeline.hpp"
-#include "core/Typedefs.hpp"
+#include "Defines.hpp"
+#include "core/Compiler.hpp"
 #include "Turtle.hpp"
 #include "ui/editor/Pipeline.hpp"
 #include "Camera.hpp"
 
-#include <array>
-#include <cstddef>
-#include <cstring>
 #include <imgui.h>
 #include <imnodes.h>
-#include <format>
-#include <cstdint>
-#include <variant>
+#include <quill/LogMacros.h>
+#include <quill/Frontend.h>
+
+#include <cstddef>
+#include <cstring>
 
 //==============================================================================
-Application::Application() : running(true), sdl(), imguiLayer() {
-
+Application::Application()
+    :   running(true),
+        sdl(),
+        imguiLayer()
+{
+    this->logger = quill::Frontend::get_logger(Defines::Logger::Names::APPLICATION);
 }
 //==============================================================================
 Application::~Application() {
+    LOG_INFO(this->logger, "Application stopped");
 
 }
 //==============================================================================
 void Application::run() {
-    SDL_Log("Application started");
+    LOG_INFO(this->logger, "Application started");
 
     try {
         this->imguiLayer.init(this->sdl.getWindow(), this->sdl.getRenderer());
     } catch (const std::exception& e) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to initialize ImGUI: %s", e.what());
+        LOG_ERROR(this->logger, "Failed to initialize ImGUI: {}", e.what());
         return;
     }
     // std::vector<Editor::Link> links;
     // int nextLinkId{1000};
 
+    int winWidth{};
+    int winHeight{};
+
     Camera camera(1, 20.f);
-    // Turtle::Builder builder;s
+    Turtle::Builder builder({0.f, 0.f}, 0.f, 2.f);
     UI::Editor::Pipeline uiEditor;
 
+    auto previousTime = SDL_GetTicksNS();
+
     while(this->running) {
+
+        const auto currentTime = SDL_GetTicksNS();
+
+        const float dt = std::min(
+            static_cast<float>(currentTime - previousTime) / 1'000'000'000.f,
+            0.05f
+        );
+
+        previousTime = currentTime;
+
+        if(!ImGui::GetIO().WantCaptureMouse) {
+            camera.update(dt);
+        }
 
         while(auto event = this->sdl.pollEvent()) {
 
@@ -49,19 +70,18 @@ void Application::run() {
             switch(event.value().type) {
                 case SDL_EVENT_QUIT: {
                     this->running = false;
-                    SDL_Log("Event: quit");
+                    LOG_INFO(this->logger, "Event: quit");
                     break;
                 }
                 case SDL_EVENT_KEY_DOWN: {
                     switch(event.value().key.scancode) {
                         case SDL_SCANCODE_ESCAPE : {
                             this->running = false;
-                            SDL_Log("Event: key_escape");
+                            LOG_INFO(this->logger, "Event: key_escape");
                             break;
                         }
 
                         default: {
-                            camera.handleEvent(event.value());
                             break;
                         }
                     }
@@ -73,20 +93,40 @@ void Application::run() {
 
         this->sdl.render({
             [&](SDL_Renderer* renderer) {
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+                this->sdl.getSize(&winWidth, &winHeight);
+                const auto scale = camera.getScale();
+                const auto offsetX = camera.getOffsetX();
+                const auto offsetY = camera.getOffsetY();
 
-                // for(const auto& [start, end] : builder.getSegments()) {
-                //     if(!SDL_RenderLine(
-                //         renderer,
-                //         start.x * camera.getScale() + camera.getOffsetX(),
-                //         start.y * camera.getScale() + camera.getOffsetY(),
-                //         end.x * camera.getScale() + camera.getOffsetX(),
-                //         end.y * camera.getScale() + camera.getOffsetY())) {
-                //         SDL_LogError(SDL_LOG_CATEGORY_RENDER,
-                //             "Failed to render line: %s", SDL_GetError()
-                //         );
-                //     }
-                // }
+                const float worldLeft =  -offsetX / scale;
+                const float worldRight = (winWidth - offsetX) / scale;
+                const float worldTop = -offsetY / scale;
+                const float worldBottom = (winHeight - offsetY) / scale;
+
+                for(const auto& [start, end] : builder.getSegments()) {
+                    const float minX = std::min(start.x, end.x);
+                    const float minY = std::min(start.y, end.y);
+                    const float maxX = std::max(start.x, end.x);
+                    const float maxY = std::max(start.y, end.y);
+
+                    if(maxX <= worldLeft
+                        || minX >= worldRight
+                        || maxY <= worldTop
+                        || minY >= worldBottom) {
+                        continue;
+                    }
+
+                    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+                    if(!SDL_RenderLine(
+                        renderer,
+                        start.x * scale + offsetX,
+                        start.y * scale + offsetY,
+                        end.x * scale + offsetX,
+                        end.y * scale + offsetY)
+                    ) {
+                        LOG_ERROR(this->logger, "Failed to render line: {}", SDL_GetError());
+                    }
+                }
 
             },
             [&](SDL_Renderer* renderer) {
@@ -97,15 +137,17 @@ void Application::run() {
                             auto result = uiEditor.build();
 
                             if(result.has_value()) {
+                                builder.clear();
                                 auto lsys = std::move(result.value());
                                 lsys.run();
-                                lsys.print();
+
+                                ImGui::Text("%zu", lsys.getData().size() / 8 / 1024);
+
+                                LSystem::Compiler compiler;
+                                compiler.compile(lsys, builder);
                             }
                             else {
-                                SDL_LogError(SDL_LOG_CATEGORY_RENDER,
-                                    "Failed to build LSystem: %s",
-                                    result.error().c_str()
-                                );
+                                LOG_INFO(this->logger, "Failed to build LSystem: {}", result.error().c_str());
                             }
                         }
                     }

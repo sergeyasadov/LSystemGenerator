@@ -11,6 +11,8 @@ public:
     Camera();
     Camera(float scale, float factor);
 
+    void update(float dt);
+
     const SDL_FPoint& getOffset() const;
     float getOffsetX() const;
     float getOffsetY() const;

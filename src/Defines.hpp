@@ -1,6 +1,4 @@
-#ifndef DEFINES_HPP
-#define DEFINES_HPP
-
+#pragma once
 
 namespace Defines {
     namespace Window {
@@ -8,6 +6,15 @@ namespace Defines {
         inline constexpr auto WIDTH = 800;
         inline constexpr auto HEIGHT = 600;
     }
-}
 
-#endif // DEFINES_HPP
+    namespace Logger {
+        static inline constexpr auto CONSOLE_SINK = "ConsoleMainSink";
+
+        namespace Names {
+            static inline constexpr auto APPLICATION = "Application";
+            static inline constexpr auto SDL = "SDL";
+            static inline constexpr auto IMGUI_LAYER = "ImGuiLayer";
+            static inline constexpr auto LSYSTEM_COMPILER = "LSystemCompiler";
+        }
+    }
+}
