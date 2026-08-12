@@ -245,14 +245,14 @@ void UI::Editor::Pipeline::removeVariable(std::uint64_t id) {
     });
 }
 
-void UI::Editor::Pipeline::setData(const SaveData& data) {
+void UI::Editor::Pipeline::setData(const Project& data) {
     this->rules = std::move(data.rules);
     this->constants = std::move(data.constants);
     this->axiom = std::move(data.axiom);
     this->variables = std::move(data.variables);
     this->iters = data.iters;
 }
-UI::Editor::SaveData UI::Editor::Pipeline::getData() const {
+UI::Editor::Project UI::Editor::Pipeline::getData() const {
     return {
         .axiom = this->axiom,
         .iters = this->iters,

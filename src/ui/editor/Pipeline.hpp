@@ -8,7 +8,7 @@
 
 namespace UI::Editor {
 
-    struct SaveData {
+    struct Project {
         std::string axiom;
         int iters;
         std::vector<Draft::Rule> rules;
@@ -29,8 +29,8 @@ namespace UI::Editor {
 
     public:
 
-        SaveData getData() const;
-        void setData(const SaveData& data);
+        Project getData() const;
+        void setData(const Project& data);
 
         bool draw();
 
