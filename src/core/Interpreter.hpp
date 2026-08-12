@@ -22,18 +22,22 @@ class Interpreter {
         void setAxiom(std::string_view axiom);
         void setRules(std::vector<Rule> rules);
         void setConstants(std::vector<Constant> constants);
+        void setVariables(std::vector<Variable> variables);
         void setIterations(std::uint32_t iters);
 
         void pushRule(Rule rule);
         void pushConstant(Constant constant);
+        void pushVariable(Variable variable);
 
         Command makeCommand(const UI::Editor::Draft::Command& draft);
 
         const Rules& getRules() const;
+        const Variables& getVariables() const;
         const Constants& getConstants() const;
         const Axiom& getAxiom() const;
         const Iterations& getIterations() const;
         const Data& getData() const;
+
 
         void nextIteration();
         void run();

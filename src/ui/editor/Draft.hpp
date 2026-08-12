@@ -25,4 +25,10 @@ namespace UI::Editor::Draft {
         Command command;
     };
 
+    struct Variable final {
+        std::uint64_t id;
+        std::string name;
+        Command command;
+    };
+
 }

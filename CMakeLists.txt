@@ -13,7 +13,11 @@ FetchContent_Declare(
     SDL3
     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
     GIT_TAG release-3.4.12
+    GIT_PROGRESS TRUE
 )
+
+set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+set(SDL_STATIC ON CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(SDL3)
 #===============================================================================
@@ -21,6 +25,7 @@ FetchContent_Declare(
     imgui_source
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
     GIT_TAG v1.92.9-docking
+    GIT_PROGRESS TRUE
 )
 
 FetchContent_MakeAvailable(imgui_source)
@@ -58,6 +63,7 @@ FetchContent_Declare(
     imnodes
     GIT_REPOSITORY https://github.com/Nelarius/imnodes.git
     GIT_TAG master
+    GIT_PROGRESS TRUE
 )
 
 set(
@@ -79,6 +85,7 @@ FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
     GIT_TAG 1.0.3
+    GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(glm)
 #===============================================================================
@@ -86,10 +93,19 @@ FetchContent_Declare(
     quill
     GIT_REPOSITORY https://github.com/odygrd/quill.git
     GIT_TAG v12.1.0
+    GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(quill)
 
 set(QUILL_COMPILE_WITH_HEADER_ONLY OFF CACHE INTERNAL "")
+#===============================================================================
+FetchContent_Declare(
+    glaze
+    GIT_REPOSITORY https://github.com/stephenberry/glaze.git
+    GIT_TAG v8.0.0
+    GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(glaze)
 #===============================================================================
 add_executable(${PROJECT_NAME}
     src/main.cpp
@@ -116,7 +132,6 @@ add_executable(${PROJECT_NAME}
 
     src/ui/ImGuiLayer.cpp
     src/ui/ImGuiLayer.hpp
-
     src/ui/editor/Node.cpp
     src/ui/editor/Node.hpp
     src/ui/editor/Pipeline.cpp
@@ -128,9 +143,11 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        SDL3::SDL3
+        SDL3::SDL3-static
         glm::glm
         imgui::imgui
         imnodes
         quill::quill
+        glaze::glaze
 )
+#===============================================================================

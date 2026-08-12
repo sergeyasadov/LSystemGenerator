@@ -16,6 +16,9 @@ bool UI::Editor::Pipeline::draw() {
     ImGui::SeparatorText("Constants");
     this->drawConstants();
 
+    ImGui::SeparatorText("Variables");
+    this->drawVariables();
+
     if(!this->error.empty()) {
         ImGui::TextColored(
             ImVec4{1.0f, 0.0f, 0.0f, 1.0f},
@@ -42,14 +45,13 @@ UI::Editor::Pipeline::build() {
         return std::unexpected(this->error);
     }
 
-
     LSystem::Interpreter interpreter;
 
     interpreter.setAxiom(std::move(this->axiom));
     interpreter.setIterations(std::move(this->iters));
 
     for(const auto& rule : this->rules) {
-        if(rule.symbol.size() > 1) {
+        if(rule.symbol.size() != 1) {
             this->error = "Rule symbol must be a single character";
             return std::unexpected(this->error);
         }
@@ -63,13 +65,24 @@ UI::Editor::Pipeline::build() {
     }
 
     for(const auto& constant : this->constants) {
-        if(constant.name.size() > 1) {
+        if(constant.name.size() != 1) {
             this->error = "Constant name must be a single character";
             return std::unexpected(this->error);
         }
         interpreter.pushConstant({
             .value = constant.name[0],
             .command = interpreter.makeCommand(constant.command)
+        });
+    }
+
+    for(const auto& variable : this->variables) {
+        if(variable.name.size() != 1) {
+            this->error = "Variable name must be a single character";
+            return std::unexpected(this->error);
+        }
+        interpreter.pushVariable({
+            .value = variable.name[0],
+            .command = interpreter.makeCommand(variable.command)
         });
     }
 
@@ -120,8 +133,8 @@ void UI::Editor::Pipeline::drawRules() {
 
             ImGui::PopID();
         }
+        ImGui::EndTable();
     }
-    ImGui::EndTable();
 }
 
 void UI::Editor::Pipeline::drawConstants() {
@@ -170,8 +183,48 @@ void UI::Editor::Pipeline::drawConstants() {
 
             ImGui::PopID();
         }
+        ImGui::EndTable();
     }
-    ImGui::EndTable();
+}
+
+void UI::Editor::Pipeline::drawVariables() {
+    if(ImGui::Button("Add variable")) {
+        this->variables.push_back({this->nextId++});
+    }
+
+    if(ImGui::BeginTable("Variables", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders)) {
+        ImGui::TableSetupColumn("Symbol");
+        ImGui::TableSetupColumn("Argument");
+        ImGui::TableSetupColumn("Command");
+        ImGui::TableSetupColumn("Delete");
+        ImGui::TableHeadersRow();
+
+        for(auto& v : this->variables) {
+            ImGui::PushID(static_cast<int>(v.id));
+            ImGui::TableNextRow();
+
+            ImGui::TableSetColumnIndex(0);
+            ImGui::InputText("##Symbol", &v.name);
+
+            ImGui::TableSetColumnIndex(1);
+            ImGui::InputFloat("##Argument", &v.command.argument);
+
+            ImGui::TableSetColumnIndex(2);
+            auto command = static_cast<int>(v.command.type);
+
+            if(ImGui::Combo("##Command", &command, LSystem::commands_cstr.data(), LSystem::commands_cstr.size())) {
+                v.command.type = static_cast<LSystem::CommandType>(command);
+            }
+
+            ImGui::TableSetColumnIndex(3);
+            if(ImGui::Button("Delete")) {
+                this->removeVariable(v.id);
+            }
+
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
 }
 
 void UI::Editor::Pipeline::removeRule(std::uint64_t id) {
@@ -184,4 +237,27 @@ void UI::Editor::Pipeline::removeConstant(std::uint64_t id) {
     std::erase_if(this->constants, [id](const auto& c) {
         return c.id == id;
     });
+}
+
+void UI::Editor::Pipeline::removeVariable(std::uint64_t id) {
+    std::erase_if(this->variables, [id](const auto& v) {
+        return v.id == id;
+    });
+}
+
+void UI::Editor::Pipeline::setData(const SaveData& data) {
+    this->rules = std::move(data.rules);
+    this->constants = std::move(data.constants);
+    this->axiom = std::move(data.axiom);
+    this->variables = std::move(data.variables);
+    this->iters = data.iters;
+}
+UI::Editor::SaveData UI::Editor::Pipeline::getData() const {
+    return {
+        .axiom = this->axiom,
+        .iters = this->iters,
+        .rules = this->rules,
+        .constants = this->constants,
+        .variables = this->variables
+    };
 }

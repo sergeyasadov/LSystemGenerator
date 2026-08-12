@@ -25,6 +25,9 @@ namespace UI {
         ImGuiLayer();
         ~ImGuiLayer();
 
+        ImGuiLayer(const ImGuiLayer&) = delete;
+        ImGuiLayer& operator=(const ImGuiLayer&) = delete;
+
         void init(SDL_Window* window, SDL_Renderer* renderer);
 
         void processEvent(SDL_Event& event);

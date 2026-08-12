@@ -16,6 +16,7 @@ void Logger::init() {
         Defines::Logger::Names::SDL,
         Defines::Logger::Names::IMGUI_LAYER,
         Defines::Logger::Names::LSYSTEM_COMPILER,
+        Defines::Logger::Names::CONFIG
     };
 
     quill::Backend::start();

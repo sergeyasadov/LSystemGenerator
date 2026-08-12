@@ -1,5 +1,4 @@
 #include "Application.hpp"
-#include "Defines.hpp"
 
 #include "utils/Logger.hpp"
 

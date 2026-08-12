@@ -1,6 +1,9 @@
 #pragma once
 
 namespace Defines {
+
+    static inline constexpr auto DATA_FILE = "lsystemdata.json";
+
     namespace Window {
         inline constexpr auto TITLE = "LSystem";
         inline constexpr auto WIDTH = 800;
@@ -15,6 +18,7 @@ namespace Defines {
             static inline constexpr auto SDL = "SDL";
             static inline constexpr auto IMGUI_LAYER = "ImGuiLayer";
             static inline constexpr auto LSYSTEM_COMPILER = "LSystemCompiler";
+            static inline constexpr auto CONFIG = "Config";
         }
     }
 }

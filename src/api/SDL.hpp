@@ -25,6 +25,9 @@ namespace API {
         SDL();
         ~SDL();
 
+        SDL(const SDL&) = delete;
+        SDL& operator=(const SDL&) = delete;
+
         std::optional<SDL_Event> pollEvent();
 
         SDL_Window* getWindow() const;

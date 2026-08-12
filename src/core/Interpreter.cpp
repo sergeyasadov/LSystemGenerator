@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <algorithm>
 #include <utility>
-#include <cstdio>
 
 
 using namespace LSystem;
@@ -67,6 +66,10 @@ const Iterations& Interpreter::getIterations() const {
     return this->iterations;
 }
 //==============================================================================
+const Variables& Interpreter::getVariables() const {
+    return this->variables;
+}
+//==============================================================================
 const Constants& Interpreter::getConstants() const {
     return this->constants;
 }
@@ -107,6 +110,10 @@ void Interpreter::pushRule(Rule rule) {
 //==============================================================================
 void Interpreter::pushConstant(Constant constant) {
     this->constants.push_back(constant);
+}
+//==============================================================================
+void Interpreter::pushVariable(Variable variable) {
+    this->variables.push_back(variable);
 }
 //==============================================================================
 void Interpreter::run() {

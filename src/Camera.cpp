@@ -20,7 +20,8 @@ Camera::Camera(float scale, float factor)
 void Camera::update(float dt) {
     const auto keys = SDL_GetKeyboardState(nullptr);
 
-    this->scale += (keys[SDL_SCANCODE_Z] - keys[SDL_SCANCODE_X]) * 0.2f;
+    const float scaleChange = static_cast<float>(keys[SDL_SCANCODE_Z]) - static_cast<float>(keys[SDL_SCANCODE_X]);
+    this->scale *= std::exp(scaleChange * 2 * dt);
     this->scale = std::clamp(this->scale, 0.01f, 200.f);
 
     float dx = static_cast<float>(keys[SDL_SCANCODE_A] - keys[SDL_SCANCODE_D]);

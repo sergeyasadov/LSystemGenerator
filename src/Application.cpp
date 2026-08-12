@@ -1,7 +1,9 @@
 #include "Application.hpp"
 #include "Defines.hpp"
+#include "SDL3/SDL_filesystem.h"
 #include "core/Compiler.hpp"
 #include "Turtle.hpp"
+#include "core/Typedefs.hpp"
 #include "ui/editor/Pipeline.hpp"
 #include "Camera.hpp"
 
@@ -9,6 +11,9 @@
 #include <imnodes.h>
 #include <quill/LogMacros.h>
 #include <quill/Frontend.h>
+#include <glaze/json.hpp>
+#include <glaze/core/istream_buffer.hpp>
+#include <glaze/core/ostream_buffer.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -17,14 +22,21 @@
 Application::Application()
     :   running(true),
         sdl(),
-        imguiLayer()
+        imguiLayer(),
+        dataPath(std::filesystem::path(SDL_GetUserFolder(SDL_FOLDER_DOCUMENTS)) / Defines::DATA_FILE)
 {
     this->logger = quill::Frontend::get_logger(Defines::Logger::Names::APPLICATION);
+    LOG_INFO(this->logger, "Default save data path: {}", this->dataPath.string());
+
+    if(!std::filesystem::exists(this->dataPath)) {
+        LOG_WARNING(this->logger, "Data file not found, creating new one");
+        std::ofstream(this->dataPath).close();
+        LOG_INFO(this->logger, "Data file created");
+    }
 }
 //==============================================================================
 Application::~Application() {
     LOG_INFO(this->logger, "Application stopped");
-
 }
 //==============================================================================
 void Application::run() {
@@ -36,6 +48,7 @@ void Application::run() {
         LOG_ERROR(this->logger, "Failed to initialize ImGUI: {}", e.what());
         return;
     }
+
     // std::vector<Editor::Link> links;
     // int nextLinkId{1000};
 
@@ -48,6 +61,18 @@ void Application::run() {
 
     auto previousTime = SDL_GetTicksNS();
 
+
+    std::ifstream readDataFile(this->dataPath);
+    glz::basic_istream_buffer<std::ifstream> buffer(readDataFile);
+
+    UI::Editor::SaveData readDataBuffer;
+
+    auto ec = glz::read_json(readDataBuffer, buffer);
+    if(ec) {
+        LOG_WARNING(this->logger, "Failed to read data");
+    }
+    uiEditor.setData(readDataBuffer);
+
     while(this->running) {
 
         const auto currentTime = SDL_GetTicksNS();
@@ -59,7 +84,7 @@ void Application::run() {
 
         previousTime = currentTime;
 
-        if(!ImGui::GetIO().WantCaptureMouse) {
+        if(!ImGui::GetIO().WantCaptureKeyboard) {
             camera.update(dt);
         }
 
@@ -94,6 +119,7 @@ void Application::run() {
         this->sdl.render({
             [&](SDL_Renderer* renderer) {
                 this->sdl.getSize(&winWidth, &winHeight);
+
                 const auto scale = camera.getScale();
                 const auto offsetX = camera.getOffsetX();
                 const auto offsetY = camera.getOffsetY();
@@ -128,34 +154,59 @@ void Application::run() {
                     }
                 }
 
-            },
-            [&](SDL_Renderer* renderer) {
                 this->imguiLayer.render(renderer, [&] {
 
                     if(ImGui::Begin("Editor")) {
+
                         if(uiEditor.draw()) {
                             auto result = uiEditor.build();
 
                             if(result.has_value()) {
-                                builder.clear();
-                                auto lsys = std::move(result.value());
-                                lsys.run();
+                                try {
+                                    auto lsys = std::move(result.value());
+                                    lsys.run();
 
-                                ImGui::Text("%zu", lsys.getData().size() / 8 / 1024);
+                                    Turtle::Builder candidate({0.f, 0.f}, 0.f, 2.f);
+                                    LSystem::Compiler compiler;
+                                    compiler.compile(lsys, candidate);
 
-                                LSystem::Compiler compiler;
-                                compiler.compile(lsys, builder);
+                                    builder = std::move(candidate);
+                                }
+                                catch(const std::exception& e) {
+                                    LOG_ERROR(this->logger, "Failed to compile LSystem: {}", e.what());
+                                }
                             }
                             else {
-                                LOG_INFO(this->logger, "Failed to build LSystem: {}", result.error().c_str());
+                                LOG_ERROR(this->logger, "Failed to build LSystem: {}", result.error().c_str());
                             }
                         }
+
+                        ImGui::SameLine();
+
+                        if(ImGui::Button("Save")) {
+                            std::ofstream writeDataFile(this->dataPath);
+                            glz::basic_ostream_buffer<std::ofstream> buffer(writeDataFile);
+                            auto ex = glz::write_json(uiEditor.getData(), buffer);
+
+                            if(ex.ec != glz::error_code::none) {
+                                LOG_ERROR(this->logger, "Failed to save LSystem");
+                            }
+                            else {
+                                LOG_INFO(this->logger, "LSystem data saved");
+                            }
+                        }
+
                     }
                     ImGui::End();
 
+                    if(ImGui::Begin("Nodes")) {
+                        ImNodes::BeginNodeEditor();
 
 
-                    // if(ImGui::Begin("Editor")) {
+
+                        ImNodes::EndNodeEditor();
+                    }
+                    ImGui::End();
 
                     //     ImNodes::BeginNodeEditor();
 

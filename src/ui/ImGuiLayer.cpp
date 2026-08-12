@@ -51,6 +51,7 @@ void UI::ImGuiLayer::init(SDL_Window* window, SDL_Renderer* renderer) {
     this->platformInit = true;
     if(!ImGui_ImplSDLRenderer3_Init(renderer)) {
         ImGui_ImplSDL3_Shutdown();
+        this->platformInit = false;
         throw std::runtime_error("Failed to initialize ImGui for SDL renderer");
     }
     LOG_INFO(this->logger, "Render init");
@@ -59,11 +60,11 @@ void UI::ImGuiLayer::init(SDL_Window* window, SDL_Renderer* renderer) {
 
 //==============================================================================
 UI::ImGuiLayer::~ImGuiLayer() {
-    if(this->platformInit) {
+    if(this->renderInit) {
         ImGui_ImplSDLRenderer3_Shutdown();
         LOG_INFO(this->logger, "Platform shutdown");
     }
-    if(this->renderInit) {
+    if(this->platformInit) {
         ImGui_ImplSDL3_Shutdown();
         LOG_INFO(this->logger, "Render shutdown");
     }

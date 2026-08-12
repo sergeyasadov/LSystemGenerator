@@ -21,6 +21,13 @@ API::SDL::SDL()
         return;
     }
 
+    if(!SDL_Init(SDL_INIT_VIDEO)) {
+        LOG_CRITICAL(this->logger, "Failed to initialize SDL: {}", SDL_GetError());
+        throw;
+    }
+    LOG_INFO(this->logger, "SDL initialized successfully");
+
+
     this->window = SDL_CreateWindow(
         Defines::Window::TITLE,
         Defines::Window::WIDTH,
@@ -28,13 +35,15 @@ API::SDL::SDL()
         this->windowFlags
     );
     if(this->window == nullptr) {
-        LOG_INFO(this->logger, "Failed to create window: {}", SDL_GetError());
+        LOG_CRITICAL(this->logger, "Failed to create window: {}", SDL_GetError());
+        throw;
     }
     LOG_INFO(this->logger, "Window created successfully");
 
     this->renderer = SDL_CreateRenderer(this->window, nullptr);
     if(this->renderer == nullptr) {
-        LOG_INFO(this->logger, "Failed to create renderer: {}", SDL_GetError());
+        LOG_CRITICAL(this->logger, "Failed to create renderer: {}", SDL_GetError());
+        throw;
     }
     LOG_INFO(this->logger, "Renderer created successfully");
 

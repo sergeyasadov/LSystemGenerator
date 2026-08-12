@@ -27,6 +27,16 @@ void LSystem::Compiler::compile(const LSystem::Interpreter& interpreter, Turtle:
         LOG_INFO(logger, "Rule: {}", var.value);
     }
 
+    for(const auto& [variableValue, command] : interpreter.getVariables()) {
+        if(command == nullptr) {
+            LOG_WARNING(logger, "Variable {} has no command", variableValue);
+            continue;
+        }
+
+        commandMap.insert_or_assign(variableValue, command);
+        LOG_INFO(logger, "Variable: {}", variableValue);
+    }
+
     for(const auto& [constVal, command] : interpreter.getConstants()) {
         if(command == nullptr) {
             LOG_WARNING(logger, "Constant {} has no command", constVal);
