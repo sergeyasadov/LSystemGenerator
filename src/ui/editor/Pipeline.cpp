@@ -133,7 +133,7 @@ void UI::Editor::Pipeline::drawRules() {
 
             ImGui::PopID();
         }
-        ImGui::EndTable();
+    ImGui::EndTable();
     }
 }
 
@@ -204,15 +204,15 @@ void UI::Editor::Pipeline::drawVariables() {
             ImGui::TableNextRow();
 
             ImGui::TableSetColumnIndex(0);
-            ImGui::InputText("##Symbol", &v.name);
+            ImGui::InputText("##SymbolVar", &v.name);
 
             ImGui::TableSetColumnIndex(1);
-            ImGui::InputFloat("##Argument", &v.command.argument);
+            ImGui::InputFloat("##ArgumentVar", &v.command.argument);
 
             ImGui::TableSetColumnIndex(2);
             auto command = static_cast<int>(v.command.type);
 
-            if(ImGui::Combo("##Command", &command, LSystem::commands_cstr.data(), LSystem::commands_cstr.size())) {
+            if(ImGui::Combo("##CommandVar", &command, LSystem::commands_cstr.data(), LSystem::commands_cstr.size())) {
                 v.command.type = static_cast<LSystem::CommandType>(command);
             }
 

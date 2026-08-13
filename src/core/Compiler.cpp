@@ -8,6 +8,7 @@
 #include <quill/Frontend.h>
 #include <quill/LogMacros.h>
 
+//==============================================================================
 LSystem::Compiler::Compiler()
 {
 }
@@ -17,6 +18,7 @@ void LSystem::Compiler::compile(const LSystem::Interpreter& interpreter, Turtle:
     auto logger = quill::Frontend::get_logger(Defines::Logger::Names::LSYSTEM_COMPILER);
 
     std::unordered_map<LSystem::Value, LSystem::Command> commandMap;
+
     for(const auto& [var, _] : interpreter.getRules()) {
         if(var.command == nullptr) {
             LOG_WARNING(logger, "Rule {} has no command", var.value);

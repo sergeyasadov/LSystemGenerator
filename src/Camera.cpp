@@ -43,7 +43,13 @@ void Camera::update(float dt) {
     this->offset.y += dy * dist;
 }
 //==============================================================================
-const SDL_FPoint& Camera::getOffset() const {
+void Camera::setWindowSize(int width, int height) {
+    this->windowSize.x = static_cast<float>(width);
+    this->windowSize.y = static_cast<float>(height);
+}
+
+//==============================================================================
+const glm::vec2& Camera::getOffset() const {
     return offset;
 }
 //==============================================================================
@@ -63,7 +69,7 @@ float Camera::getFactor() const {
     return factor;
 }
 //==============================================================================
-void Camera::setOffset(const SDL_FPoint& offset) {
+void Camera::setOffset(const glm::vec2& offset) {
     this->offset = offset;
 }
 //==============================================================================
@@ -99,12 +105,29 @@ void Camera::handleEvent(const SDL_Event& event) {
     }
 }
 //==============================================================================
-glm::vec4 Camera::transform(const glm::vec4& position) const {
+bool Camera::isVisible(const glm::vec2& start, const glm::vec2& end) const {
+    const float worldLeft =  -this->offset.x / this->scale;
+    const float worldRight = (this->windowSize.x - this->offset.x) / this->scale;
+    const float worldTop = -this->offset.y / this->scale;
+    const float worldBottom = (this->windowSize.y - this->offset.y) / this->scale;
+
+    const float minX = std::min(start.x, end.x);
+    const float minY = std::min(start.y, end.y);
+    const float maxX = std::max(start.x, end.x);
+    const float maxY = std::max(start.y, end.y);
+
+    return maxX <= worldLeft
+        || minX >= worldRight
+        || maxY <= worldTop
+        || minY >= worldBottom;
+}
+//==============================================================================
+glm::vec4 Camera::transform(const glm::vec2& start, const glm::vec2& end) const {
     return {
-        position.x * this->scale + this->offset.x,
-        position.y * this->scale + this->offset.y,
-        position.z * this->scale + this->offset.x,
-        position.w * this->scale + this->offset.y
+        start.x * this->scale + this->offset.x,
+        start.y * this->scale + this->offset.y,
+        end.x * this->scale + this->offset.x,
+        end.y * this->scale + this->offset.y
     };
 }
 //==============================================================================

@@ -3,7 +3,6 @@
 #include "SDL3/SDL_filesystem.h"
 #include "core/Compiler.hpp"
 #include "Turtle.hpp"
-#include "core/Typedefs.hpp"
 #include "ui/editor/Pipeline.hpp"
 #include "Camera.hpp"
 
@@ -39,6 +38,11 @@ Application::Application()
         return;
     }
 
+    int winWidth{};
+    int winHeight{};
+    this->sdl.getSize(&winWidth, &winHeight);
+    this->camera.setWindowSize(winWidth, winHeight);
+
     if(!std::filesystem::exists(this->dataPath)) {
         LOG_WARNING(this->logger, "Data file not found, creating new one");
         std::ofstream(this->dataPath).close();
@@ -50,7 +54,6 @@ Application::~Application() {
     LOG_INFO(this->logger, "Application stopped");
 }
 //==============================================================================
-
 void Application::loadProject() {
     std::ifstream readDataFile(this->dataPath);
     glz::basic_istream_buffer<std::ifstream> buffer(readDataFile);
@@ -61,7 +64,7 @@ void Application::loadProject() {
     }
     this->pipelineEditor.setData(this->project);
 }
-
+//==============================================================================
 void Application::saveProject() {
     std::ofstream writeDataFile(this->dataPath);
     glz::basic_ostream_buffer<std::ofstream> buffer(writeDataFile);
@@ -74,58 +77,27 @@ void Application::saveProject() {
         LOG_INFO(this->logger, "LSystem data saved");
     }
 }
-
-void Application::rebuildSystem() {
-
-}
-
-void Application::drawSystem(SDL_Renderer* renderer) {
-    int winWidth{};
-    int winHeight{};
-
-    this->sdl.getSize(&winWidth, &winHeight);
-
-    const auto scale = this->camera.getScale();
-    const auto offsetX = this->camera.getOffsetX();
-    const auto offsetY = this->camera.getOffsetY();
-
-    const float worldLeft =  -offsetX / scale;
-    const float worldRight = (winWidth - offsetX) / scale;
-    const float worldTop = -offsetY / scale;
-    const float worldBottom = (winHeight - offsetY) / scale;
+//==============================================================================
+void Application::drawSystem() {
+    this->sdl.setRenderDrawColor({1.f, 1.f, 1.f, 1.f});
 
     for(const auto& [start, end] : this->builder.getSegments()) {
-        const float minX = std::min(start.x, end.x);
-        const float minY = std::min(start.y, end.y);
-        const float maxX = std::max(start.x, end.x);
-        const float maxY = std::max(start.y, end.y);
-
-        if(maxX <= worldLeft
-            || minX >= worldRight
-            || maxY <= worldTop
-            || minY >= worldBottom) {
+        if(this->camera.isVisible(start, end)) {
             continue;
         }
 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-        if(!SDL_RenderLine(
-            renderer,
-            start.x * scale + offsetX,
-            start.y * scale + offsetY,
-            end.x * scale + offsetX,
-            end.y * scale + offsetY)
-        ) {
+        if(!this->sdl.renderLine(this->camera.transform(start, end))) {
             LOG_ERROR(this->logger, "Failed to render line: {}", SDL_GetError());
         }
     }
 }
-
+//==============================================================================
 void Application::drawEditor(SDL_Renderer* renderer) {
     this->imguiLayer.render(renderer, [&] {
 
         if(ImGui::Begin("Editor")) {
-
             if(this->pipelineEditor.draw()) {
+
                 auto result = this->pipelineEditor.build();
 
                 if(result.has_value()) {
@@ -158,7 +130,7 @@ void Application::drawEditor(SDL_Renderer* renderer) {
         }
     });
 }
-
+//==============================================================================
 void Application::run() {
     LOG_INFO(this->logger, "Application started");
 
@@ -191,14 +163,25 @@ void Application::run() {
             switch(event.value().type) {
                 case SDL_EVENT_QUIT: {
                     this->running = false;
-                    LOG_INFO(this->logger, "Event: quit");
+                    LOG_DEBUG(this->logger, "Event: quit");
                     break;
                 }
                 case SDL_EVENT_KEY_DOWN: {
                     switch(event.value().key.scancode) {
                         case SDL_SCANCODE_ESCAPE : {
                             this->running = false;
-                            LOG_INFO(this->logger, "Event: key_escape");
+                            LOG_DEBUG(this->logger, "Event: key_escape");
+                            break;
+                        }
+
+                        case SDL_SCANCODE_1: {
+                            this->builder.setConvertCoords(Turtle::CoordSystem::DEFAULT);
+                            LOG_INFO(this->logger, "Set convert coords to DEFAULT");
+                            break;
+                        }
+                        case SDL_SCANCODE_2: {
+                            this->builder.setConvertCoords(Turtle::CoordSystem::SCREEN);
+                            LOG_INFO(this->logger, "Set convert coords to SCREEN");
                             break;
                         }
 
@@ -215,7 +198,7 @@ void Application::run() {
         this->sdl.render({
             [&](SDL_Renderer* renderer) {
 
-                this->drawSystem(renderer);
+                this->drawSystem();
 
                 this->drawEditor(renderer);
             }

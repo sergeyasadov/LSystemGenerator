@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <SDL3/SDL.h>
+#include <glm/vec2.hpp>
 #include <vector>
 #include <stack>
 
@@ -9,13 +9,18 @@
 namespace Turtle {
 
     struct State {
-        SDL_FPoint position;
+        glm::vec2 position;
         float angle;
     };
 
     struct Segment {
-        SDL_FPoint start;
-        SDL_FPoint end;
+        glm::vec2 start;
+        glm::vec2 end;
+    };
+
+    enum class CoordSystem {
+        DEFAULT,
+        SCREEN
     };
 
 
@@ -23,19 +28,22 @@ namespace Turtle {
         std::vector<Segment> segments;
         State state;
         float step;
+        CoordSystem convertCoords;
 
         std::stack<State> stateStack;
         std::vector<Segment> segmentStack;
 
     public:
-        Builder(SDL_FPoint pos, float angle, float step);
+        Builder(glm::vec2 pos, float angle, float step);
 
-        const std::vector<Segment>& getSegments() const;
+        const std::vector<Segment>& getSegments() const noexcept;
 
         void forward(bool draw);
         void rotate(float angle);
         void restore();
         void save();
+
+        void setConvertCoords(CoordSystem convert);
 
         void clear();
     };

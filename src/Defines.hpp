@@ -6,8 +6,8 @@ namespace Defines {
 
     namespace Window {
         inline constexpr auto TITLE = "LSystem";
-        inline constexpr auto WIDTH = 800;
-        inline constexpr auto HEIGHT = 600;
+        inline constexpr auto WIDTH = 1000;
+        inline constexpr auto HEIGHT = 900;
     }
 
     namespace Logger {

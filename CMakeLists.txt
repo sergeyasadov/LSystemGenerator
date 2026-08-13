@@ -97,6 +97,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(quill)
 
+set(QUILL_DISABLE_FILE_INFO ON)
 set(QUILL_COMPILE_WITH_HEADER_ONLY OFF CACHE INTERNAL "")
 #===============================================================================
 FetchContent_Declare(

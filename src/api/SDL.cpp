@@ -47,6 +47,8 @@ API::SDL::SDL()
     }
     LOG_INFO(this->logger, "Renderer created successfully");
 
+    LOG_INFO(this->logger, "Renderer backend: {}", SDL_GetRendererName(this->renderer));
+
 }
 //==============================================================================
 API::SDL::~SDL() {
@@ -75,6 +77,16 @@ SDL_Renderer* API::SDL::getRenderer() const {
     return this->renderer;
 }
 //==============================================================================
+glm::vec2 API::SDL::getRenderScale() const {
+    glm::vec2 scale;
+    SDL_GetRenderScale(this->renderer, &scale.x, &scale.y);
+    return std::move(scale);
+}
+//==============================================================================
+bool API::SDL::setRenderScale(glm::vec2 scale) {
+    return SDL_SetRenderScale(this->renderer, scale.x, scale.y);
+}
+//==============================================================================
 void API::SDL::render(std::vector<std::function<void(SDL_Renderer*)>> renderers) const {
     SDL_SetRenderDrawColor(this->renderer, 33, 33, 33, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(this->renderer);
@@ -86,5 +98,17 @@ void API::SDL::render(std::vector<std::function<void(SDL_Renderer*)>> renderers)
 //==============================================================================
 void API::SDL::getSize(int* x, int* y) const {
     SDL_GetRenderOutputSize(this->renderer, x, y);
+}
+//==============================================================================
+bool API::SDL::renderLine(glm::vec2 start, glm::vec2 end) const {
+    return SDL_RenderLine(this->renderer, start.x, start.y, end.x, end.y);
+}
+//==============================================================================
+bool API::SDL::renderLine(glm::vec4 line) const {
+    return SDL_RenderLine(this->renderer, line.x, line.y, line.z, line.w);
+}
+//==============================================================================
+void API::SDL::setRenderDrawColor(glm::vec4 color) const {
+    SDL_SetRenderDrawColor(this->renderer, 255 * color.x, 255 * color.y, 255 * color.z, 255 * color.w);
 }
 //==============================================================================

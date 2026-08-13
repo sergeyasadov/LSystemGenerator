@@ -1,5 +1,4 @@
 #include "Logger.hpp"
-
 #include "../Defines.hpp"
 
 #include <array>
@@ -8,7 +7,6 @@
 #include <quill/Frontend.h>
 #include <quill/Backend.h>
 #include <quill/sinks/ConsoleSink.h>
-
 
 void Logger::init() {
     static constexpr std::array names = {

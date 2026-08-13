@@ -29,7 +29,6 @@ public:
 private:
     void loadProject();
     void saveProject();
-    void rebuildSystem();
-    void drawSystem(SDL_Renderer*);
+    void drawSystem();
     void drawEditor(SDL_Renderer*);
 };

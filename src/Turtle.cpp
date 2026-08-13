@@ -3,26 +3,30 @@
 #include <cmath>
 #include <numbers>
 
+
 static constexpr auto TURN_ANGLE = std::numbers::pi / 180.0F;
 
 
-Turtle::Builder::Builder(SDL_FPoint pos, float angle, float step)
-    :   state(pos, angle), step(step)
+Turtle::Builder::Builder(glm::vec2 pos, float angle, float step)
+    :   state(pos, angle), step(step), convertCoords(CoordSystem::SCREEN)
 {}
 //==============================================================================
-void Turtle::Builder::forward(bool draw)
-{
-    const SDL_FPoint begin = this->state.position;
+void Turtle::Builder::forward(bool draw) {
+    const glm::vec2 begin = this->state.position;
 
     this->state.position.x += this->step * std::cosf(this->state.angle * TURN_ANGLE);
     this->state.position.y += this->step * std::sinf(this->state.angle * TURN_ANGLE);
 
-    if (draw)
+    if(draw)
     {
-        this->segments.emplace_back(begin, this->state.position);
+        glm::vec2 renderBegin = begin;
+        glm::vec2 renderEnd = this->state.position;
+        if(this->convertCoords == CoordSystem::DEFAULT) {
+            renderBegin = glm::vec2(begin.y, -begin.x);
+            renderEnd = glm::vec2(this->state.position.y, -this->state.position.x);
+        }
+        this->segments.emplace_back(renderBegin, renderEnd);
     }
-
-    // SDL_Log("forward: begin = (%f, %f), end = (%f, %f)", begin.x, begin.y, this->state.position.x, this->state.position.y);
 }
 //==============================================================================
 void Turtle::Builder::rotate(float angle) {
@@ -42,7 +46,7 @@ void Turtle::Builder::save() {
     this->stateStack.push(this->state);
 }
 //==============================================================================
-const std::vector<Turtle::Segment>& Turtle::Builder::getSegments() const {
+const std::vector<Turtle::Segment>& Turtle::Builder::getSegments() const noexcept {
     return this->segments;
 }
 //==============================================================================
@@ -52,5 +56,9 @@ void Turtle::Builder::clear() {
     this->stateStack = std::stack<State>();
     this->state.position = {0.0f, 0.0f};
     this->state.angle = 0.0f;
+}
+//==============================================================================
+void Turtle::Builder::setConvertCoords(CoordSystem convert) {
+    this->convertCoords = convert;
 }
 //==============================================================================
