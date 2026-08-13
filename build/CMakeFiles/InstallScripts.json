@@ -1,8 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/cogitary/Desktop/Devs/lsys/build/cmake_install.cmake",
-		"/Users/cogitary/Desktop/Devs/lsys/build/_deps/sdl3-build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
